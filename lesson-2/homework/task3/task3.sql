@@ -5,4 +5,6 @@ create table photos(
 );
 
 insert into photos
-select * from openrowset( bulk 'C:\Users\user\sql-homeworks\lesson-2\homework\task3', single_blob) as img;
+select * from openrowset( bulk 'C:\Users\user\sql-homeworks\lesson-2\homework\task3\apple.png', single_blob) as img;
+
+select * from photos;

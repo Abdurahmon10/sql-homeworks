@@ -1,6 +1,15 @@
 import pyodbc
 
-conn=pyodbc.connect("driver={sql server};Server=localhost\MSSQLSERVER01;Database=task3;Trusted_Connection=True;")
+uid = 'WIN-VSF9TGHH5LD'
+server = 'localhost'
+port = 1433
+database = 'master'
+pwd = '1234qwerASDF'
+
+
+con_str = f'DRIVER=sql server;SERVER={server};PORT={port};DATABASE={database};UID={uid};PWD={pwd};TDS_VERSION=7.3'
+
+conn=pyodbc.connect(con_str)
 
 cur=conn.cursor()
 
