@@ -62,7 +62,7 @@ select UnitPrice, OrderID from OrderDetails order by UnitPrice desc;
 select o.OrderId, customerName, od.ProductName, od.UnitPrice
 from Orders o
 cross apply (
-	select top 3 OrderID, ProductName, UnitPrice from OrderDetails od
+	select top 1 OrderID, ProductName, UnitPrice from OrderDetails od
 	where od.OrderID=o.OrderID
 	order by UnitPrice desc
 ) as od
@@ -104,16 +104,112 @@ select * from TestMax;
 select Year1, GREATEST(Max1, max2, Max3) from TestMax
 
 -- Solution 2: Sanjarbek Gulomjonov
-select Year1, max(Max1)from (	select Year1, Max1 from TestMax	union all	select Year1, Max2 from TestMax	union all	select Year1, Max3 from TestMax) as tgroup by Year1
+select Year1, max(Max1)
+from (
+	select Year1, Max1 from TestMax
+	union all
+	select Year1, Max2 from TestMax
+	union all
+	select Year1, Max3 from TestMax
+) as t
+group by Year1
 
 -- Solution 3: Sohibjon Dilmurodov
-SELECT Year1, 	CASE		WHEN Max1>Max2 THEN (CASE WHEN Max1>Max3 THEN Max1 ELSE Max3 END) 	ELSE (CASE WHEN Max2>Max3 THEN Max2 ELSE Max3 END)	END as absmaxFROM TestMax;
+SELECT Year1, 
+	CASE
+		WHEN Max1>Max2 THEN (CASE WHEN Max1>Max3 THEN Max1 ELSE Max3 END) 
+	ELSE (CASE WHEN Max2>Max3 THEN Max2 ELSE Max3 END)
+	END as absmax
+FROM TestMax;
 
 
 -- Solution 4: Azizbek Saparbayev
-select Year1, Max(MaxValue) as MaxValue from (	select Year1, Max1 as MaxValue from TestMax	union all	select Year1, Max2 as MaxValue from TestMax	union all	select Year1, Max3 as MaxValue from TestMax) as MaxValgroup by Year1;
+select Year1, Max(MaxValue) as MaxValue from 
+(
+	select Year1, Max1 as MaxValue from TestMax
+	union all
+	select Year1, Max2 as MaxValue from TestMax
+	union all
+	select Year1, Max3 as MaxValue from TestMax
+) as MaxVal
+group by Year1;
 
 
 -- Solution 5: Sohibjon Dilmurodov
-SELECT Year1,IIF(Max1>Max2, IIF(Max1>Max3, Max1, Max3), IIF(Max2>Max3, Max2, Max3)) as absmaxFROM TestMax;-- Solution6: Mardon Hazratovselect Year1,    (        select max(mx)         from         (            select Max1 as mx from TestMax t1 where t1.Year1 = t.Year1            union all             select Max2 from TestMax t1 where t1.Year1 = t.Year1            union all             select Max3 from TestMax t1 where t1.Year1 = t.Year1        ) as mx    )from TestMax t;-- ===============================-- VALUES-- ===============================create table demo(	col1 int, col2 int);insert into demoVALUES	(1, 2),	(3, 4),	(5, 6);insert into demoselect 1, 2union allselect 3, 4union allselect 5, 6select * from (	select 1 as col1, 2 as col2	union all	select 3, 4	union all	select 5, 6) t
-select col1, col2 from (	VALUES		(1, 2),		(3, 4),		(5, 6)) t(col1, col2)select max(val) from (	values (10), (101), (87)) t(val)select	Year1, --max1, max2, max3,	(		select max(val) from (			values (max1), (max2), (max3)		) t(val)	) as max_valfrom TestMax;
+SELECT Year1,
+IIF(Max1>Max2, IIF(Max1>Max3, Max1, Max3), IIF(Max2>Max3, Max2, Max3)) as absmax
+FROM TestMax;
+
+-- Solution6: Mardon Hazratov
+select Year1,
+    (
+        select max(mx) 
+        from 
+        (
+            select Max1 as mx from TestMax t1 where t1.Year1 = t.Year1
+            union all 
+            select Max2 from TestMax t1 where t1.Year1 = t.Year1
+            union all 
+            select Max3 from TestMax t1 where t1.Year1 = t.Year1
+        ) as mx
+    )
+from TestMax t;
+
+
+-- ===============================
+-- VALUES
+-- ===============================
+
+create table demo(
+	col1 int, col2 int
+);
+
+insert into demo
+VALUES
+	(1, 2),
+	(3, 4),
+	(5, 6);
+
+insert into demo
+select 1, 2
+union all
+select 3, 4
+union all
+select 5, 6
+
+select * from (
+	select 1 as col1, 2 as col2
+	union all
+	select 3, 4
+	union all
+	select 5, 6
+) t
+
+
+select col1, col2 from (
+	VALUES
+		(1, 2),
+		(3, 4),
+		(5, 6)
+) t(col1, col2)
+
+
+select max(val) from (
+	values (10), (101), (87)
+) t(val)
+
+
+select
+	Year1, --max1, max2, max3,
+	(
+		select max(val) from (
+			values (max1), (max2), (max3)
+		) t(val)
+	) as max_val
+from TestMax;
+
+
+
+
+
+
